@@ -81,7 +81,8 @@ Railway deployment (results: 28/28).
 - **Inference provider:** Kimi K3. It is one of the most powerful open-weight models, very close to
   fable 5 in performance at a fraction of the cost. I chose it because I like to do important tasks
   with strong models and I like using open-weight models I can self-host and use privately. This
-  Kimi K3 endpoint is served by me on Modal.com.
+  Kimi K3 endpoint is served by me on Modal.com to power the coding agent (while the deployed service
+  itself calls Google Gemini from AI Studio for the diff reviews, picked for its speed and reliability).
 
 ## AI suggestion I rejected (and why)
 
