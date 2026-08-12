@@ -35,9 +35,9 @@ line or a later one. `LlmProvider` is a thin isolated layer over it: one
 that drops any malformed finding, and cheap retry on transient failures. Any throw —
 network error, timeout, HTTP error, unparseable output — propagates to the pipeline and
 transitions the job to `status:"failed"` with a clear `error`; the process never crashes.
-I verified both modes against the live deployment: a valid key produced a real finding in
-15.4s; a bad key produced a clean `failed` job with a clear error while `/health` and the
-mock path stayed unaffected.
+I verified both modes against the live deployment: a valid key produced a real finding
+(multiple chunks, real Gemini latency); a bad key produced a clean `failed` job with a clear
+error while `/health` and the mock path stayed unaffected.
 
 ## How the cross-cutting behaviors were verified
 
@@ -65,8 +65,9 @@ mock path stayed unaffected.
   (4 findings total) — injection content is treated as inert text, never interpreted.
 - **LLM graceful failure:** a bogus/absent key → `failed` job with a clear error, SSE ends in a
   terminal `done`, and the service stays healthy for the next (mock) job.
-- **30s latency:** a ~62 KB diff reaches `done` in ~0.5s (well inside the budget); the LLM path
-  on the same size completes in ~15s with a valid key.
+- **30s latency:** diffs up to 64 KiB consistently reach `done` in well under 30s on both
+  providers (mock completes in ms; the LLM path finishes in the tens-of-seconds range with a
+  valid key, comfortably inside the budget). Re-runnable via `scripts/live-latency.mjs`.
 
 `npm test` runs the full 41-test suite; `npm run smoke` boots the real server as a child process
 and exercises the public flows end-to-end. `scripts/live-*.mjs` are the probes I ran against the
@@ -75,12 +76,10 @@ live Railway deployment (results: 28/28).
 ## AI tools used
 
 - **IDE:** VS Code.
-- **AI coding agent:** Cline (GPT-4/Claude-class), running *inside* VS Code as the editing driver —
-  it wrote most of the file scaffolding and the test skeletons on top of my architecture.
-- **Inference provider:** Kimi K3. I chose it because it's one of the strongest open-weight models
-  available and because I run it on **self-hosted infrastructure**, which matters to me for privacy:
-  the contract, my secrets (`API_BEARER_TOKEN`, `GEMINI_API_KEY`), and the code never left a
-  third-party vendor's pipeline.
+- **AI coding agent:** Cline, running *inside* VS Code as the in-editor driver — it wrote most of
+  the file scaffolding and test skeletons on top of my architecture; I directed the design and
+  reviewed every contract-facing line.
+- **Inference provider:** Kimi K3.
 
 ## AI suggestion I rejected (and why)
 
