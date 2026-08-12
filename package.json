@@ -1,0 +1,27 @@
+{
+  "name": "ai-diff-review-service",
+  "version": "1.0.0",
+  "description": "AI diff review service (Xsolla take-home): unified diff in, structured review findings out.",
+  "private": true,
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node --env-file-if-exists=.env dist/index.js",
+    "dev": "node --env-file-if-exists=.env --watch -r ts-node/register src/index.ts",
+    "smoke": "node --env-file-if-exists=.env scripts/smoke.mjs",
+    "pretest": "npm run build",
+    "test": "node --env-file-if-exists=.env --test \"dist/test/*.test.js\""
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.0"
+  }
+}
